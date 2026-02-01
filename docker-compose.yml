@@ -1,36 +1,38 @@
 services:
   backend:
     build:
-      context: ../project-taski
+      context: ../taski-virtual
       dockerfile: ./backend/Dockerfile
-    image: ju1ie/taski_backend
     container_name: taski_backend
-    ports:
-      - "8000:8000"
-    environment:
-      - DEBUG=True
-      - ALLOWED_HOSTS=*
+    restart: unless-stopped
+    expose:
+      - "8000"
+    networks:
+      - backend
 
   frontend:
     build:
-      context: ../project-taski
+      context: ../taski-virtual
       dockerfile: ./frontend/Dockerfile
-    image: ju1ie/taski_frontend
     container_name: taski_frontend
-    depends_on:
+    restart: unless-stopped
+    networks:
       - backend
-    ports:
-      - "3000:3000"
 
   nginx:
-    image: nginx:1.25-alpine
-    network_mode: "host"
     build:
-      context: ../project-taski
+      context: ../taski-virtual
       dockerfile: ./nginx/Dockerfile
     container_name: taski_nginx
-    depends_on:
-      - frontend
+    restart: unless-stopped
     ports:
       - "80:80"
-    
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

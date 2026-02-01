@@ -1,15 +1,15 @@
-FROM node:20.9.0-alpine as build 
+# stage 1: build React
+FROM node:18-alpine AS build
 
 WORKDIR /app
-
-COPY package*.json ./
-
+COPY frontend/package*.json ./
 RUN npm install
-
-COPY . .
-
+COPY frontend/ .
 RUN npm run build
 
-CMD ["npx", "-y", "http-server", "-p", "3000", "/app/build"]
-
-EXPOSE 3000
+# stage 2: serve with nginx
+FROM nginx:1.25-alpine
+COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
