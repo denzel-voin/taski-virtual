@@ -1,0 +1,3 @@
+/terraform/environments/prod/terraform.tfvars
+/terraform/environments/prod/.terraform/
+/terraform/modules/vm/.terraform/
